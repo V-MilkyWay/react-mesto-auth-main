@@ -1,15 +1,18 @@
 import React from 'react';
 import Header from './Header.js';
+import Login from './Login.js';
+import Register from './Register.js'
 import Main from './Main.js';
 import Footer from './Footer.js';
 import api from '../utils/api.js';
 import ImagePopup from './ImagePopup.js';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import PopupWithForm from './PopupWithForm.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
+import InfoTooltip from './InfoTooltip.js'
 
 function App() {
     const [cards, setCards] = React.useState([]);
@@ -19,7 +22,7 @@ function App() {
     const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
     const [isEditAgreePopupOpen, setEditAgreePopupOpen] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState({ bool: false, link: '' });
-    const [loggedIn, stLoggedIn] = React.useState(false);
+    const [loggedIn, setLoggedIn] = React.useState(false);
 
     React.useEffect(() => {
         function initialCards() {
@@ -130,26 +133,31 @@ function App() {
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
+                <InfoTooltip onClose={closeAllPopups} />
                 <EditProfilePopup onUpdateUser={handleUpdateUser} isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} />
                 <AddPlacePopup onAddPlaceSubmit={handleAddPlaceSubmit} isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} />
                 <ImagePopup card={selectedCard} onClose={closeAllPopups} />
                 <PopupWithForm type="deletion" isOpen={isEditAgreePopupOpen ? 'popup_opened' : ''} name="formAgree" title="Вы уверены?" text="Да" />
                 <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
-                <Route path="/sign-up"></Route>
-                <Route path="/sign-in"></Route>
+                <Route path="/sign-up">
+                    <Register />
+                </Route>
+                <Route path="/sign-in">
+                    <Login />
+                </Route>
                 <Route exact path="/">
-                <Header />
-                <Main
-                    onEditAvatar={handleEditAvatarClick}
-                    onAddPlace={handleAddPlaceClick}
-                    onEditProfile={handleEditProfileClick}
-                    onCardClick={handleCardClick}
-                    cards={cards}
-                    onCardLike={handleCardLike}
-                    onCardDelete={handleCardDelete}
-                />
-                <Footer />
-                {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+                    <Header />
+                    <Main
+                        onEditAvatar={handleEditAvatarClick}
+                        onAddPlace={handleAddPlaceClick}
+                        onEditProfile={handleEditProfileClick}
+                        onCardClick={handleCardClick}
+                        cards={cards}
+                        onCardLike={handleCardLike}
+                        onCardDelete={handleCardDelete}
+                    />
+                    {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+                    <Footer />
                 </Route>
             </div>
         </CurrentUserContext.Provider>
