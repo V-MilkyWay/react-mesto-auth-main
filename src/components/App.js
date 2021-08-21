@@ -4,6 +4,7 @@ import Main from './Main.js';
 import Footer from './Footer.js';
 import api from '../utils/api.js';
 import ImagePopup from './ImagePopup.js';
+import { Route } from 'react-router-dom';
 import PopupWithForm from './PopupWithForm.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
@@ -18,6 +19,7 @@ function App() {
     const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
     const [isEditAgreePopupOpen, setEditAgreePopupOpen] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState({ bool: false, link: '' });
+    const [loggedIn, stLoggedIn] = React.useState(false);
 
     React.useEffect(() => {
         function initialCards() {
@@ -133,6 +135,9 @@ function App() {
                 <ImagePopup card={selectedCard} onClose={closeAllPopups} />
                 <PopupWithForm type="deletion" isOpen={isEditAgreePopupOpen ? 'popup_opened' : ''} name="formAgree" title="Вы уверены?" text="Да" />
                 <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
+                <Route path="/sign-up"></Route>
+                <Route path="/sign-in"></Route>
+                <Route exact path="/">
                 <Header />
                 <Main
                     onEditAvatar={handleEditAvatarClick}
@@ -144,6 +149,8 @@ function App() {
                     onCardDelete={handleCardDelete}
                 />
                 <Footer />
+                {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+                </Route>
             </div>
         </CurrentUserContext.Provider>
     );
