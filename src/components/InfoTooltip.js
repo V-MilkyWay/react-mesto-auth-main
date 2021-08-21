@@ -8,7 +8,7 @@ const status2 = 'Что-то пошло не так! Попробуйте ещё
 function InfoTooltip(props) {
     return (
         <>
-            <div className={`popup popup_type_infoTooltip popup_opened`} >
+            <div className={`popup popup_type_infoTooltip`} >
                 <div className="popup__container">
                     <button onClick={props.onClose} type="button" className="popup__close-button"></button>
                     <div className="form">

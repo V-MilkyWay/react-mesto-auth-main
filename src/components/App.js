@@ -6,7 +6,8 @@ import Main from './Main.js';
 import Footer from './Footer.js';
 import api from '../utils/api.js';
 import ImagePopup from './ImagePopup.js';
-import { Route, Redirect } from 'react-router-dom';
+import ProtectedRoute from "./ProtectedRoute.js"
+import { Route, Redirect, Link } from 'react-router-dom';
 import PopupWithForm from './PopupWithForm.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
@@ -145,20 +146,36 @@ function App() {
                 <Route path="/sign-in">
                     <Login />
                 </Route>
-                <Route exact path="/">
-                    <Header />
-                    <Main
-                        onEditAvatar={handleEditAvatarClick}
+                <ProtectedRoute
+                    exact path="/"
+                    children={
+                        <>
+                            <h2 className="header__email-info">Radshura@yandex.ru</h2>
+                            <Link className="header__link" to="/sign-in">
+                                Выйти
+                            </Link>
+                        </>
+                    }
+                    loggedIn={loggedIn}
+                    component={Header}
+                />
+                <ProtectedRoute
+                    exact path="/"
+                    onEditAvatar={handleEditAvatarClick}
                         onAddPlace={handleAddPlaceClick}
                         onEditProfile={handleEditProfileClick}
                         onCardClick={handleCardClick}
                         cards={cards}
                         onCardLike={handleCardLike}
                         onCardDelete={handleCardDelete}
-                    />
-                    {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
-                    <Footer />
-                </Route>
+                    loggedIn={loggedIn}
+                    component={Main}
+                />
+                <ProtectedRoute
+                    exact path="/"
+                    loggedIn={loggedIn}
+                    component={Footer}
+                />
             </div>
         </CurrentUserContext.Provider>
     );
