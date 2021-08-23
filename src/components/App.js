@@ -8,7 +8,7 @@ import api from '../utils/api.js';
 import * as Auth from '../utils/auth.js';
 import ImagePopup from './ImagePopup.js';
 import ProtectedRoute from "./ProtectedRoute.js"
-import { Route, Link, useHistory } from 'react-router-dom';
+import { Route, Link, useHistory, Switch, Redirect } from 'react-router-dom';
 import PopupWithForm from './PopupWithForm.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
@@ -184,42 +184,51 @@ function App() {
                 <ImagePopup card={selectedCard} onClose={closeAllPopups} />
                 <PopupWithForm type="deletion" isOpen={isEditAgreePopupOpen ? 'popup_opened' : ''} name="formAgree" title="Вы уверены?" text="Да" />
                 <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
-                <Route path="/sign-up">
-                    <Register onInfoTooltip={handleInfoTooltip} />
-                </Route>
-                <Route path="/sign-in">
-                    <Login handleLogin={handleLogin} />
-                </Route>
-                <ProtectedRoute
-                    exact path="/"
-                    children={
-                        <>
-                            <h2 className="header__email-info">{email}</h2>
-                            <Link onClick={signOut} className="header__link" to="/sign-in">
-                                Выйти
-                            </Link>
-                        </>
-                    }
-                    loggedIn={loggedIn}
-                    component={Header}
-                />
-                <ProtectedRoute
-                    exact path="/"
-                    onEditAvatar={handleEditAvatarClick}
-                    onAddPlace={handleAddPlaceClick}
-                    onEditProfile={handleEditProfileClick}
-                    onCardClick={handleCardClick}
-                    cards={cards}
-                    onCardLike={handleCardLike}
-                    onCardDelete={handleCardDelete}
-                    loggedIn={loggedIn}
-                    component={Main}
-                />
-                <ProtectedRoute
-                    exact path="/"
-                    loggedIn={loggedIn}
-                    component={Footer}
-                />
+                <Switch>
+                    <Route path="/sign-up">
+                        <Register onInfoTooltip={handleInfoTooltip} />
+                    </Route>
+                    <Route path="/sign-in">
+                        <Login handleLogin={handleLogin} />
+                    </Route>
+                    <ProtectedRoute
+                        exact path="/"
+                        children={
+                            <>
+                                <h2 className="header__email-info">{email}</h2>
+                                <Link onClick={signOut} className="header__link" to="/sign-in">
+                                    Выйти
+                                </Link>
+                            </>
+                        }
+                        loggedIn={loggedIn}
+                        component={Header}
+                    />
+                    <ProtectedRoute
+                        exact path="/"
+                        onEditAvatar={handleEditAvatarClick}
+                        onAddPlace={handleAddPlaceClick}
+                        onEditProfile={handleEditProfileClick}
+                        onCardClick={handleCardClick}
+                        cards={cards}
+                        onCardLike={handleCardLike}
+                        onCardDelete={handleCardDelete}
+                        loggedIn={loggedIn}
+                        component={Main}
+                    />
+                    <ProtectedRoute
+                        exact path="/"
+                        loggedIn={loggedIn}
+                        component={Footer}
+                    />
+                    <Route>
+                        {loggedIn ? (
+                            <Redirect to="/" />
+                        ) : (
+                            <Redirect to="/sign-in" />
+                        )}
+                    </Route>
+                </Switch>
             </div>
         </CurrentUserContext.Provider>
     );
