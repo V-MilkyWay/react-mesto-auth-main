@@ -5,9 +5,10 @@ import Register from './Register.js'
 import Main from './Main.js';
 import Footer from './Footer.js';
 import api from '../utils/api.js';
+import * as Auth from '../Auth.js';
 import ImagePopup from './ImagePopup.js';
 import ProtectedRoute from "./ProtectedRoute.js"
-import { Route, Redirect, Link } from 'react-router-dom';
+import { Route, Link, withRouter, useHistory } from 'react-router-dom';
 import PopupWithForm from './PopupWithForm.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
@@ -24,6 +25,7 @@ function App() {
     const [isEditAgreePopupOpen, setEditAgreePopupOpen] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState({ bool: false, link: '' });
     const [loggedIn, setLoggedIn] = React.useState(false);
+    const [email, setEmail] = React.useState('');
 
     React.useEffect(() => {
         function initialCards() {
@@ -131,6 +133,38 @@ function App() {
         });
     }
 
+    function handleLogin() {
+        setLoggedIn(true);
+    }
+
+    function componentDidMount() {
+        tokenCheck()
+    };
+    const history = useHistory();
+    function tokenCheck() {
+        // если у пользователя есть токен в localStorage,
+        // эта функция проверит валидность токена
+        const jwt = localStorage.getItem('jwt');
+        if (jwt) {
+            // проверим токен
+            Auth.getContent(jwt).then((res) => {
+                if (res) {
+                    setEmail(res.data.email)
+                    // авторизуем пользователя
+                    setLoggedIn(true);
+                    history.push("/");
+                }
+            });
+        }
+    }
+
+    function signOut() {
+        localStorage.removeItem('jwt');
+        history.push('/login');
+        setLoggedIn(false);
+    }
+    componentDidMount();
+
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
@@ -144,14 +178,14 @@ function App() {
                     <Register />
                 </Route>
                 <Route path="/sign-in">
-                    <Login />
+                    <Login handleLogin={handleLogin} />
                 </Route>
                 <ProtectedRoute
                     exact path="/"
                     children={
                         <>
-                            <h2 className="header__email-info">Radshura@yandex.ru</h2>
-                            <Link className="header__link" to="/sign-in">
+                            <h2 className="header__email-info">{email}</h2>
+                            <Link onClick={signOut} className="header__link" to="/sign-in">
                                 Выйти
                             </Link>
                         </>
@@ -162,12 +196,12 @@ function App() {
                 <ProtectedRoute
                     exact path="/"
                     onEditAvatar={handleEditAvatarClick}
-                        onAddPlace={handleAddPlaceClick}
-                        onEditProfile={handleEditProfileClick}
-                        onCardClick={handleCardClick}
-                        cards={cards}
-                        onCardLike={handleCardLike}
-                        onCardDelete={handleCardDelete}
+                    onAddPlace={handleAddPlaceClick}
+                    onEditProfile={handleEditProfileClick}
+                    onCardClick={handleCardClick}
+                    cards={cards}
+                    onCardLike={handleCardLike}
+                    onCardDelete={handleCardDelete}
                     loggedIn={loggedIn}
                     component={Main}
                 />
