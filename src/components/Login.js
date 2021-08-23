@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import Header from './Header.js';
-import * as Auth from '../Auth.js';
+import * as Auth from '../utils/auth.js';
 
 class Login extends React.Component {
   constructor(props){

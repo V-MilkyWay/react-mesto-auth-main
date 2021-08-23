@@ -5,10 +5,10 @@ import Register from './Register.js'
 import Main from './Main.js';
 import Footer from './Footer.js';
 import api from '../utils/api.js';
-import * as Auth from '../Auth.js';
+import * as Auth from '../utils/auth.js';
 import ImagePopup from './ImagePopup.js';
 import ProtectedRoute from "./ProtectedRoute.js"
-import { Route, Link, withRouter, useHistory } from 'react-router-dom';
+import { Route, Link, useHistory } from 'react-router-dom';
 import PopupWithForm from './PopupWithForm.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
@@ -20,12 +20,16 @@ function App() {
     const [cards, setCards] = React.useState([]);
     const [currentUser, setCurrentUser] = React.useState({});
     const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);
+    const [isInfoTooltip, setInfoTooltip] = React.useState(false);
     const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
     const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = React.useState(false);
     const [isEditAgreePopupOpen, setEditAgreePopupOpen] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState({ bool: false, link: '' });
     const [loggedIn, setLoggedIn] = React.useState(false);
     const [email, setEmail] = React.useState('');
+    const [image, setImage] = React.useState('');
+    const [status, setStatus] = React.useState('');
+    const history = useHistory();
 
     React.useEffect(() => {
         function initialCards() {
@@ -78,6 +82,7 @@ function App() {
         setAddPlacePopupOpen(false);
         setEditAvatarPopupOpen(false);
         setEditAgreePopupOpen(false);
+        setInfoTooltip(false);
         setSelectedCard({
             bool: false,
             link: '',
@@ -140,7 +145,7 @@ function App() {
     function componentDidMount() {
         tokenCheck()
     };
-    const history = useHistory();
+
     function tokenCheck() {
         // если у пользователя есть токен в localStorage,
         // эта функция проверит валидность токена
@@ -160,22 +165,27 @@ function App() {
 
     function signOut() {
         localStorage.removeItem('jwt');
-        history.push('/login');
         setLoggedIn(false);
+    }
+
+    function handleInfoTooltip(image, status) {
+        setInfoTooltip(true);
+        setImage(image);
+        setStatus(status);
     }
     componentDidMount();
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
-                <InfoTooltip onClose={closeAllPopups} />
+                <InfoTooltip image={image} status={status} onClose={closeAllPopups} isOpen={isInfoTooltip ? 'popup_opened' : ''} />
                 <EditProfilePopup onUpdateUser={handleUpdateUser} isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} />
                 <AddPlacePopup onAddPlaceSubmit={handleAddPlaceSubmit} isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} />
                 <ImagePopup card={selectedCard} onClose={closeAllPopups} />
                 <PopupWithForm type="deletion" isOpen={isEditAgreePopupOpen ? 'popup_opened' : ''} name="formAgree" title="Вы уверены?" text="Да" />
                 <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
                 <Route path="/sign-up">
-                    <Register />
+                    <Register onInfoTooltip={handleInfoTooltip} />
                 </Route>
                 <Route path="/sign-in">
                     <Login handleLogin={handleLogin} />

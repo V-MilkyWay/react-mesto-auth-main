@@ -1,7 +1,10 @@
 import React from 'react';
 import Header from './Header.js';
 import { Link, withRouter } from 'react-router-dom';
-import * as Auth from '../Auth.js';
+import * as Auth from '../utils/auth.js';
+import * as Utils from '../utils/constants.js';
+import imageErrRegister from '../images/Union.svg';
+import imageGoodRegister from '../images/icon.svg';
 
 class Register extends React.Component {
     constructor(props) {
@@ -21,20 +24,19 @@ class Register extends React.Component {
     }
     handleSubmit(e) {
         e.preventDefault();
-            const {email, password } = this.state;
-            Auth.register( email, password).then((res) => {
-                if (res) {
-                    this.setState({
-                        message: ''
-                    }, () => {
-                        this.props.history.push('/sign-in');
-                    })
-                } else {
-                    this.setState({
-                        message: 'Что-то пошло не так!'
-                    })
-                }
-            });
+        const { email, password } = this.state;
+        Auth.register(email, password).then((res) => {
+            if (res) {
+                this.props.onInfoTooltip(imageGoodRegister, Utils.statusGood);
+                this.props.history.push('/sign-in');
+
+            } else {
+                this.props.onInfoTooltip(imageErrRegister, Utils.statusErr);
+                console.log(123)
+            }
+        }).catch((err) => {
+            console.log(err);
+        });
     }
     render() {
         return (

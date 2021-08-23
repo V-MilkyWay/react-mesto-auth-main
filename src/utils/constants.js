@@ -9,6 +9,8 @@ export const popupAvatarRedact = document.querySelector('.popup_type_redact-avat
 export const popupAddNewCard = document.querySelector('.popup_type_add-card');
 export const nameInput = document.querySelector('.form__input_type_name');
 export const jobInput = document.querySelector('.form__input_type_job');
+export const statusGood = 'Вы успешно зарегистрировались!';
+export const statusErr = 'Что-то пошло не так! Попробуйте ещё раз.';
 
 export const selectorsAll = {
     formSelector: '.form',
