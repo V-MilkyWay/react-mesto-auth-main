@@ -32,7 +32,6 @@ class Register extends React.Component {
 
             } else {
                 this.props.onInfoTooltip(imageErrRegister, Utils.statusErr);
-                console.log(123)
             }
         }).catch((err) => {
             console.log(err);
