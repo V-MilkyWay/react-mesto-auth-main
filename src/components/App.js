@@ -8,13 +8,16 @@ import api from '../utils/api.js';
 import * as Auth from '../utils/auth.js';
 import ImagePopup from './ImagePopup.js';
 import ProtectedRoute from "./ProtectedRoute.js"
-import { Route, Link, useHistory, Redirect, Switch } from 'react-router-dom';
+import { Route, Link, useHistory, Switch } from 'react-router-dom';
 import PopupWithForm from './PopupWithForm.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import EditAvatarPopup from './EditAvatarPopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
-import InfoTooltip from './InfoTooltip.js'
+import InfoTooltip from './InfoTooltip.js';
+import * as Utils from '../utils/constants.js';
+import imageErrRegister from '../images/Union.svg';
+import imageGoodRegister from '../images/icon.svg';
 
 function App() {
     const [cards, setCards] = React.useState([]);
@@ -138,30 +141,35 @@ function App() {
         });
     }
 
-    function handleLogin() {
-        setLoggedIn(true);
-    }
-
-    function componentDidMount() {
-        tokenCheck()
-    };
-
-    function tokenCheck() {
-        // если у пользователя есть токен в localStorage,
-        // эта функция проверит валидность токена
-        const jwt = localStorage.getItem('jwt');
-        if (jwt) {
-            // проверим токен
-            Auth.getContent(jwt).then((res) => {
-                if (res) {
-                    setEmail(res.data.email)
-                    // авторизуем пользователя
+    function handleLogin(email, password) {
+        Auth.authorize(email, password)
+            .then((data) => {
+                if (data.token) {
                     setLoggedIn(true);
-                    history.push("/");
+                    history.push('/');
                 }
-            });
-        }
+            })
+            .catch(err => console.log(err));
     }
+
+    React.useEffect(() => {
+        function tokenCheck() {
+            const jwt = localStorage.getItem('jwt');
+            if (jwt) {
+                Auth.getContent(jwt).then((res) => {
+                    if (res) {
+                        setEmail(res.data.email);
+                        setLoggedIn(true);
+                        history.push('/');
+                    }
+                }).catch((err) => {
+                    console.log(err)
+                })
+            }
+        }
+        tokenCheck();
+    }, [history]);
+
 
     function signOut() {
         localStorage.removeItem('jwt');
@@ -173,7 +181,22 @@ function App() {
         setImage(image);
         setStatus(status);
     }
-    componentDidMount();
+
+
+    function handleRegister(email, password) {
+        Auth.register(email, password)
+            .then((res) => {
+                if (res) {
+                    handleInfoTooltip(imageGoodRegister, Utils.statusGood);
+                    history.push('/sign-in');
+
+                } else {
+                    handleInfoTooltip(imageErrRegister, Utils.statusErr);
+                }
+            }).catch((err) => {
+                console.log(err);
+            });
+    }
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
@@ -186,18 +209,11 @@ function App() {
                 <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
                 <Switch>
                     <Route path="/sign-up">
-                        <Register onInfoTooltip={handleInfoTooltip} />
+                        <Register onRegister={handleRegister} />
                     </Route>
                     <Route path="/sign-in">
-                        <Login handleLogin={handleLogin} />
+                        <Login onLogin={handleLogin} />
                     </Route>
-                    <Route>
-                    {loggedIn ? (
-                        <Redirect exact to="/" />
-                    ) : (
-                        <Redirect to="/sign-in" />
-                    )}
-                </Route>
                 </Switch>
                 <ProtectedRoute
                     exact path="/"

@@ -17,9 +17,6 @@ export const register = (email, password) => {
         return (e)
       }
     })
-    .then((res) => {
-      return res;
-    })
     .catch((err) => console.log(err));
 };
 
@@ -51,5 +48,4 @@ export const getContent = (token) => {
     }
   })
   .then(res => res.json())
-  .then(data => data)
 } 
